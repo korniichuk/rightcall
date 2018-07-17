@@ -6,32 +6,78 @@ from sys import exit
 from fbi import getpassword
 from requestium import Session
 
-### Login ###
-login = 'rkorniic'
+username = 'rkorniic'
 passwd = getpassword('~/.key/odigo.enc')
-url = 'https://enregistreur.prosodie.com/odigo4isRecorder/' \
-      'EntryPoint?serviceName=LoginHandler'
+start_date = '07-01-2018'
+start_time = '12:00 AM'
+end_date = '07-01-2018'
+end_time = '12:00 PM'
+
 driver = '/usr/lib/chromium-browser/chromedriver'
 s = Session(webdriver_path=driver,
             browser='chrome',
             default_timeout=15,
             webdriver_options={'arguments': ['headless']})
-s.driver.get(url)
-s.driver.ensure_element_by_name('mail').send_keys(login)
-s.driver.ensure_element_by_name('password').send_keys(passwd)
-s.driver.ensure_element_by_name('valider').click()
 
-### Search records by date range ###
-url = 'https://enregistreur.prosodie.com/odigo4isRecorder/' \
-      'EntryPoint?serviceName=CriteresMessagesHandler&lang=en'
-s.driver.get(url)
-s.driver.ensure_element_by_name('dateDebut').send_keys('07-01-2018')
-s.driver.ensure_element_by_name('heureDebut').send_keys('12:00 AM')
-s.driver.ensure_element_by_name('dateFin').send_keys('07-17-2018')
-s.driver.ensure_element_by_name('heureFin').send_keys('12:00 PM')
-s.driver.ensure_element_by_id('button-1009').click()
+def login(s, username, passwd):
+    """Login to www.prosodie.com with username/passwd pair.
+    Input:
+        s -- Requestium session (required |
+             type: requestium.requestium.Session);
+        username -- username on www.prosodie.com (required | type: str);
+        passwd -- password for username on www.prosodie.com (required |
+                  type: str).
+    Output:
+        s -- Requestium session (required |
+             type: requestium.requestium.Session).
+
+    """
+
+    url = 'https://enregistreur.prosodie.com/odigo4isRecorder/' \
+          'EntryPoint?serviceName=LoginHandler'
+    s.driver.get(url)
+    s.driver.ensure_element_by_name('mail').send_keys(username)
+    s.driver.ensure_element_by_name('password').send_keys(passwd)
+    s.driver.ensure_element_by_name('valider').click()
+    return s
+
+def search_by_range(s, start_date=None, start_time=None, end_date=None,
+                    end_time=None):
+    """Search records on www.prosodie.com by date range.
+    Input:
+        s -- Requestium session (required |
+             type: requestium.requestium.Session),
+        start_date -- start date (not required | type: str). Format:
+                      'mm:dd:yyyy'. Example: '03-05-1991';
+        start_time -- start time (not required | type: str). Example:
+                      '12:00 AM';
+        end_date -- end date (not required | type: str). Format:
+                    'mm:dd:yyyy'. Example: '03-05-1991';
+        end_time -- end time (not required | type: str). Example: '12:00 PM'.
+    Output:
+        s -- Requestium session (required |
+             type: requestium.requestium.Session).
+
+    """
+
+    url = 'https://enregistreur.prosodie.com/odigo4isRecorder/' \
+          'EntryPoint?serviceName=CriteresMessagesHandler&lang=en'
+    s.driver.get(url)
+    if start_date:
+        s.driver.ensure_element_by_name('dateDebut').send_keys(start_date)
+    if start_time:
+        s.driver.ensure_element_by_name('heureDebut').send_keys(start_time)
+    if end_date:
+        s.driver.ensure_element_by_name('dateFin').send_keys(end_date)
+    if end_time:
+        s.driver.ensure_element_by_name('heureFin').send_keys(end_time)
+    s.driver.ensure_element_by_id('button-1009').click()
+    return s
 
 ### Download .MP3 file ###
+s = login(s, username, passwd)
+s = search_by_range(s, start_date, start_time, end_date, end_time)
+
 s.driver.ensure_element_by_class_name('x-action-col-icon').click()
 s.driver.switch_to.frame('result_frame')
 time.sleep(1)
