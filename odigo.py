@@ -20,7 +20,7 @@ s = Session(webdriver_path=driver,
             webdriver_options={'arguments': ['headless']})
 
 def login(s, username, passwd):
-    """Login to www.prosodie.com with username/passwd pair.
+    """Login to www.prosodie.com with username/passwd pair and return session.
     Input:
         s -- Requestium session (required |
              type: requestium.requestium.Session);
@@ -43,7 +43,7 @@ def login(s, username, passwd):
 
 def search_by_range(s, start_date=None, start_time=None, end_date=None,
                     end_time=None):
-    """Search records on www.prosodie.com by date range.
+    """Search records on www.prosodie.com by date range and return session.
     Input:
         s -- Requestium session (required |
              type: requestium.requestium.Session);
@@ -75,7 +75,7 @@ def search_by_range(s, start_date=None, start_time=None, end_date=None,
     return s
 
 def search_by_ref(s, ref):
-    """Search records on www.prosodie.com by date range.
+    """Search record on www.prosodie.com by ref number and return session.
     Input:
         s -- Requestium session (required |
              type: requestium.requestium.Session);
