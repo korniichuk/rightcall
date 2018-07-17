@@ -3,9 +3,8 @@
 import time
 from sys import exit
 
-from requestium import Session
-
 from fbi import getpassword
+from requestium import Session
 
 ### Login ###
 login = 'rkorniic'
