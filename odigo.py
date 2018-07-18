@@ -1,7 +1,9 @@
 #!/usr/bin/env python2
 
+import os
 import time
 
+import pandas as pd
 from bs4 import BeautifulSoup
 from fbi import getpassword
 from requestium import Session
@@ -19,12 +21,13 @@ s = Session(webdriver_path=driver,
             default_timeout=15,
             webdriver_options={'arguments': ['headless']})
 
-def download_mp3(s, path=None):
-    """Download .MP3 file from www.prosodie.com page and return session.
+def download_mp3(s, path=None, ref=None):
+    """Download mp3 file from www.prosodie.com page and return session.
     Input:
         s -- Requestium session (required |
              type: requestium.requestium.Session);
-        path -- mp3 file absolute path (not required | type: str).
+        path -- mp3 file absolute path (not required | type: str);
+        ref -- ref number (not required | type: str). Example: '3905beTOd10339';
     Output:
         s -- Requestium session (type: requestium.requestium.Session).
 
@@ -33,16 +36,17 @@ def download_mp3(s, path=None):
     s.driver.ensure_element_by_class_name('x-action-col-icon').click()
     s.driver.switch_to.frame('result_frame')
     time.sleep(1)
-    # Get ref number
-    soap = BeautifulSoup(s.driver.page_source, 'lxml')
-    ref = soap.findAll('div', class_='x-grid-cell-inner')[1].text
-    # Get URL of .MP3 file
+    # Get URL of mp3 file
     src = s.driver.ensure_element_by_id('messagePlayer').get_attribute('src')
     # Selenium --> Requests
     s.transfer_driver_cookies_to_session()
     # Download
     r = s.get(src, stream=True)
     if path == None:
+        if ref == None:
+            # Get ref number
+            soap = BeautifulSoup(s.driver.page_source, 'lxml')
+            ref = soap.findAll('div', class_='x-grid-cell-inner')[1].text
         path = '%s.mp3' % ref
     if r.status_code == 200:
         with open(path, 'wb') as f:
@@ -55,8 +59,7 @@ def download_mp3(s, path=None):
     return s
 
 def download_mp3_by_ref(s, username, passwd, ref, path=None):
-    """Download .MP3 file from www.prosodie.com page by ref number and return
-       session.
+    """Download mp3 file from www.prosodie.com page by ref number.
     Input:
         s -- Requestium session (required |
              type: requestium.requestium.Session);
@@ -70,9 +73,36 @@ def download_mp3_by_ref(s, username, passwd, ref, path=None):
 
     s = login(s, username, passwd)
     s = search_by_ref(s, ref)
-    result = download_mp3(s, path)
+    result = download_mp3(s, path, ref)
     if result == 1:
         return 1
+    s.driver.close()
+
+def download_mp3_by_csv(s, username, passwd, csv_path, download_dir=None):
+    """Download mp3 file/files from www.prosodie.com page by input csv file.
+    Input:
+        s -- Requestium session (required |
+             type: requestium.requestium.Session);
+        username -- username on www.prosodie.com (required | type: str);
+        passwd -- password for username on www.prosodie.com (required |
+                  type: str);
+        csv_path -- csv file absolute path (required | type: str);
+        download_dir -- download directory for mp3 file/files (not required | type: str).
+
+    """
+
+    s = login(s, username, passwd)
+    refs = pd.read_csv(csv_path, sep=';').Name
+    for ref in refs:
+        s = search_by_ref(s, ref)
+        mp3_path = None
+        if download_dir != None:
+            file_name = '%s.mp3' % ref
+            mp3_path = os.path.join(download_dir, file_name)
+        result = download_mp3(s, mp3_path, ref)
+        if result == 1:
+            return 1
+    s.driver.close()
 
 def login(s, username, passwd):
     """Login to www.prosodie.com with username/passwd pair and return session.
@@ -145,10 +175,17 @@ def search_by_ref(s, ref):
     s.driver.ensure_element_by_id('button-1009').click()
     return s
 
-# Example. Download .MP3 file from www.prosodie.com by '3905beTOd10339'
+# Example. Download mp3 file from www.prosodie.com by '3905beTOd10339'
 # ref number
 #download_mp3_by_ref(s, username, passwd, '3905beTOd10339')
 
-# Example. Download .MP3 file from www.prosodie.com by '3905beTOd10339'
+# Example. Download mp3 file from www.prosodie.com by '3905beTOd10339'
 # ref number as /tmp/odigo.mp3
 #download_mp3_by_ref(s, username, passwd, '3905beTOd10339', '/tmp/odigo.mp3')
+
+# Example. Download mp3 file/files from www.prosodie.com page by input csv file
+#download_mp3_by_csv(s, username, passwd, 'input.csv')
+
+# Example. Download mp3 file/files from www.prosodie.com page by input csv file
+# to dedicated directory
+#download_mp3_by_csv(s, username, passwd, 'input.csv', download_dir='/tmp')
