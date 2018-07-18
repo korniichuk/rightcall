@@ -3,6 +3,7 @@
 import time
 from sys import exit
 
+from bs4 import BeautifulSoup
 from fbi import getpassword
 from requestium import Session
 
@@ -93,19 +94,47 @@ def search_by_ref(s, ref):
     s.driver.ensure_element_by_id('button-1009').click()
     return s
 
-### Download .MP3 file ###
+def download_mp3(s, path=None):
+    """Download .MP3 file from www.prosodie.com page and return session.
+    Input:
+        s -- Requestium session (required |
+             type: requestium.requestium.Session);
+        path -- mp3 file absolute path (not required | type: str).
+    Output:
+        s -- Requestium session (required |
+             type: requestium.requestium.Session).
+
+    """
+
+    s.driver.ensure_element_by_class_name('x-action-col-icon').click()
+    s.driver.switch_to.frame('result_frame')
+    time.sleep(1)
+    # Get ref number
+    soap = BeautifulSoup(s.driver.page_source, 'lxml')
+    ref = soap.findAll('div', class_='x-grid-cell-inner')[1].text
+    # Get URL of .MP3 file
+    src = s.driver.ensure_element_by_id('messagePlayer').get_attribute('src')
+    # Selenium --> Requests
+    s.transfer_driver_cookies_to_session()
+    # Download
+    r = s.get(src, stream=True)
+    if path == None:
+        path = '%s.mp3' % ref
+    if r.status_code == 200:
+        with open(path, 'wb') as f:
+            for chunk in r.iter_content(1024*2014):
+                f.write(chunk)
+    else:
+        return 1
+    # Requests --> Selenium
+    s.transfer_session_cookies_to_driver()
+    return s
+
+### Download .MP3 file by 3905beTOd10339 ref number ###
 s = login(s, username, passwd)
 s = search_by_ref(s, '3905beTOd10339')
-
-s.driver.ensure_element_by_class_name('x-action-col-icon').click()
-s.driver.switch_to.frame('result_frame')
-time.sleep(1)
-src = s.driver.ensure_element_by_id('messagePlayer').get_attribute('src')
-s.transfer_driver_cookies_to_session()
-r = s.get(src, stream=True)
-if r.status_code == 200:
-    with open('odigo.mp3', 'wb') as f:
-        for chunk in r.iter_content(1024*2014):
-            f.write(chunk)
+result = download_mp3(s)
+if result != 1:
+   s = result
 else:
-    exit(1)
+   exit(1)
