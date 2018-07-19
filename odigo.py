@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 
 import os
+import sys
 import time
 
 import pandas as pd
@@ -93,7 +94,11 @@ def download_mp3_by_csv(s, username, passwd, csv_path, download_dir=None):
 
     s = login(s, username, passwd)
     refs = pd.read_csv(csv_path, sep=';').Name
-    for ref in refs:
+    length = len(refs)
+    for i, ref in enumerate(refs):
+        sys.stdout.write('\r')
+        sys.stdout.write('downloading: %s/%s' % (i+1, length))
+        sys.stdout.flush()
         s = search_by_ref(s, ref)
         mp3_path = None
         if download_dir != None:
@@ -102,6 +107,8 @@ def download_mp3_by_csv(s, username, passwd, csv_path, download_dir=None):
         result = download_mp3(s, mp3_path, ref)
         if result == 1:
             return 1
+    sys.stdout.write('\n')
+    sys.stdout.flush()
     s.driver.close()
 
 def login(s, username, passwd):
