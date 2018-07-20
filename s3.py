@@ -9,28 +9,33 @@ from boto3 import resource
 
 bucket_name = 'odigo-auditor'
 
-def upload_cwd(cwd, bucket_name):
-    """Upload all files from cwd to Amazon S3 bucket.
+def upload_dir(dir_abs_path, bucket_name):
+    """Upload all files from directory (recursively) to Amazon S3 bucket.
     Input:
-        cwd -- current working directory (required | type: str);
+        dir_abs_path -- directory absolute path (required | type: str).
+                        Example: '/tmp' or '/tmp/';
         bucket_name -- Amazon S3 bucket name (required | type: str).
+
     """
 
-    output = walk(cwd, topdown=True, onerror=None, followlinks=False)
-    length = sum([len(fn) for dp, dn, fn in walk(cwd)])
-    i=0
+    while dir_abs_path.endswith('/'):
+        dir_abs_path = dir_abs_path[:-1]
+    length = sum([len(fn) for dp, dn, fn in walk(dir_abs_path)])
+    output = walk(dir_abs_path, topdown=True, onerror=None, followlinks=False)
+    i = 0
     for dir_path, dir_names, file_names in output:
        for file_name in file_names:
-           i+=1
-           sys.stdout.write('\r')
-           sys.stdout.write('uploading: %s/%s' % (i, length))
-           sys.stdout.flush()
-           file_name_lower = file_name.strip().lower()
-           if not file_name_lower.endswith('~'):
+           if not file_name.strip().endswith('~'):
                file_abs_path = join(dir_path, file_name)
-               file_key = dir_path.replace(cwd, '')[1:] + '/' + file_name
+               file_key = join(dir_path.replace(dir_abs_path+'/', '') \
+                                       .replace(dir_abs_path, ''), file_name)
+               i += 1
+               sys.stdout.write('\r')
+               sys.stdout.write('uploading: %s/%s' % (i, length))
+               sys.stdout.flush()
                upload_file(file_abs_path, bucket_name, file_key)
     sys.stdout.write('\n')
+    sys.stdout.flush()
 
 def upload_file(file_abs_path, bucket_name, file_key=None):
     """Upload file to Amazon S3 bucket. If no `file_key`, file name used as
@@ -65,5 +70,5 @@ def upload_file(file_abs_path, bucket_name, file_key=None):
 # 'new.mp3' file
 #upload_file('/tmp/odigo.mp3', 'odigo-auditor', 'new.mp3')
 
-# Example. Upload current working directory to Amazon S3 'odigo-auditor' bucket
-#upload_cwd('/tmp', 'odigo-auditor')
+# Example. Upload directory (recursively) to Amazon S3 'odigo-auditor' bucket
+#upload_dir('/tmp', 'odigo-auditor')
