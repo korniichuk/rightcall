@@ -13,13 +13,13 @@ def upload_dir(dir_abs_path, bucket_name):
     """Upload all files from directory (recursively) to Amazon S3 bucket.
     Input:
         dir_abs_path -- directory absolute path (required | type: str).
-                        Example: '/tmp' or '/tmp/';
+                        Example: '/tmp/' or '/tmp';
         bucket_name -- Amazon S3 bucket name (required | type: str).
 
     """
 
-    while dir_abs_path.endswith('/'):
-        dir_abs_path = dir_abs_path[:-1]
+    if not dir_abs_path.endswith('/'):
+        dir_abs_path += '/'
     length = sum([len(fn) for dp, dn, fn in walk(dir_abs_path)])
     output = walk(dir_abs_path, topdown=True, onerror=None, followlinks=False)
     i = 0
@@ -27,8 +27,7 @@ def upload_dir(dir_abs_path, bucket_name):
        for file_name in file_names:
            if not file_name.strip().endswith('~'):
                file_abs_path = join(dir_path, file_name)
-               file_key = join(dir_path.replace(dir_abs_path+'/', '') \
-                                       .replace(dir_abs_path, ''), file_name)
+               file_key = join(dir_path.replace(dir_abs_path, ''), file_name)
                i += 1
                sys.stdout.write('\r')
                sys.stdout.write('uploading: %s/%s' % (i, length))
@@ -71,4 +70,4 @@ def upload_file(file_abs_path, bucket_name, file_key=None):
 #upload_file('/tmp/odigo.mp3', 'odigo-auditor', 'new.mp3')
 
 # Example. Upload directory (recursively) to Amazon S3 'odigo-auditor' bucket
-#upload_dir('/tmp', 'odigo-auditor')
+#upload_dir('/tmp/', 'odigo-auditor')
