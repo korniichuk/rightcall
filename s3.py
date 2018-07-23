@@ -7,7 +7,7 @@ import sys
 
 import boto3
 
-bucket_name = 'odigo-auditor'
+bucket_name = 'mp3.odigo-auditor'
 
 def upload_dir(dir_abs_path, bucket_name):
     """Upload all files from directory (recursively) to Amazon S3 bucket.
@@ -61,13 +61,14 @@ def upload_file(file_abs_path, bucket_name, key_name=None):
     else:
         return 1
 
-# Example. Upload '/tmp/odigo.mp3' file to Amazon S3 'odigo-auditor' bucket as
-# 'odigo.mp3' file
-#upload_file('/tmp/odigo.mp3', 'odigo-auditor')
+# Example. Upload '/tmp/example.mp3' file to Amazon S3 'examplebucket' bucket as
+# 'example.mp3' file
+#upload_file('/tmp/example.mp3', 'examplebucket')
 
-# Example. Upload '/tmp/odigo.mp3' file to Amazon S3 'odigo-auditor' bucket as
+# Example. Upload '/tmp/example.mp3' file to Amazon S3 'examplebucket' bucket as
 # 'new.mp3' file
-#upload_file('/tmp/odigo.mp3', 'odigo-auditor', 'new.mp3')
+#upload_file('/tmp/example.mp3', 'examplebucket', 'new.mp3')
 
-# Example. Upload directory (recursively) to Amazon S3 'odigo-auditor' bucket
-#upload_dir('/tmp/', 'odigo-auditor')
+# Example. Upload '/tmp/' directory (recursively) to Amazon S3
+# 'examplebucket' bucket
+#upload_dir('/tmp/', 'examplebucket')
