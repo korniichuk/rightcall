@@ -5,7 +5,7 @@ from os import walk
 from os.path import basename, exists, isfile, join
 import sys
 
-from boto3 import resource
+import boto3
 
 bucket_name = 'odigo-auditor'
 
@@ -27,35 +27,35 @@ def upload_dir(dir_abs_path, bucket_name):
        for file_name in file_names:
            if not file_name.strip().endswith('~'):
                file_abs_path = join(dir_path, file_name)
-               file_key = join(dir_path.replace(dir_abs_path, ''), file_name)
+               key_name = join(dir_path.replace(dir_abs_path, ''), file_name)
                i += 1
                sys.stdout.write('\r')
                sys.stdout.write('uploading: %s/%s' % (i, length))
                sys.stdout.flush()
-               upload_file(file_abs_path, bucket_name, file_key)
+               upload_file(file_abs_path, bucket_name, key_name)
     sys.stdout.write('\n')
     sys.stdout.flush()
 
-def upload_file(file_abs_path, bucket_name, file_key=None):
-    """Upload file to Amazon S3 bucket. If no `file_key`, file name used as
-       `file_key` (example: `file_abs_path` is '/tmp/odigo.mp3' and `file_key`
-       is None, that `file_key` is 'odigo.mp3').
+def upload_file(file_abs_path, bucket_name, key_name=None):
+    """Upload file to Amazon S3 bucket. If no `key_name`, file name used as
+       `key_name` (example: `file_abs_path` is '/tmp/odigo.mp3' and `key_name`
+       is None, that `key_name` is 'odigo.mp3').
     Input:
         file_abs_path -- file abs path (required | type: str);
         bucket_name -- Amazon S3 bucket name (required | type: str);
-        file_key -- Amazon S3 bucket dst file abs path (not required |
+        key_name -- Amazon S3 bucket dst file abs path (not required |
                     type: str).
 
     """
 
-    if not file_key:
-        file_key = basename(file_abs_path)
+    if not key_name:
+        key_name = basename(file_abs_path)
     # Let's use Amazon S3
-    s3 = resource('s3')
+    s3 = boto3.client('s3')
     if exists(file_abs_path) and isfile(file_abs_path):
         # Upload file to Amazon S3 bucket
         try:
-            s3.Bucket(bucket_name).upload_file(file_abs_path, file_key)
+            s3.upload_file(file_abs_path, bucket_name, key_name)
         except Exception as exception:
             return 1
     else:
