@@ -105,3 +105,6 @@ venv.bak/
 
 # .MP3
 *.mp3
+
+# .JSON
+*.json
