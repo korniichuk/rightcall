@@ -6,7 +6,7 @@ from os.path import basename, join
 
 import boto3
 
-bucket_name = 'odigo-auditor'
+bucket_name = 'transcribe.odigo-auditor'
 
 def transcribe_dir(src, dst=None, language_code='en-US'):
     """Transcribe all mp3 file/files from directory (recursively) on AWS S3 with
@@ -63,7 +63,7 @@ def transcribe_mp3(src, dst=None, job_name=None, language_code='en-US'):
 
     transcribe = boto3.client('transcribe')
     if not job_name:
-        job_name = basename(src).replace('mp3', '')
+        job_name = basename(src).replace('.mp3', '')
     if not dst:
         try:
             response = transcribe.start_transcription_job(
@@ -89,9 +89,9 @@ def transcribe_mp3(src, dst=None, job_name=None, language_code='en-US'):
 
 # Example. Transcribe
 # 'https://s3-eu-west-1.amazonaws.com/examplebucket/example.mp3' file to
-# 'odigo-auditor' bucket on AWS S3
+# 'examplebucket' bucket on AWS S3
 #transcribe_mp3('https://s3-eu-west-1.amazonaws.com/examplebucket/example.mp3',
-#               'odigo-auditor')
+#               'examplebucket')
 
 # Example. Transcribe all mp3 file from
 # 'https://s3-eu-west-1.amazonaws.com/examplebucket/examples/' directory
@@ -102,9 +102,9 @@ def transcribe_mp3(src, dst=None, job_name=None, language_code='en-US'):
 
 # Example. Transcribe all mp3 file from
 # 'https://s3-eu-west-1.amazonaws.com/examplebucket/examples/' directory
-# (recursively) on AWS S3 to 'odigo-auditor' bucket on AWS S3
+# (recursively) on AWS S3 to 'examplebucket' bucket on AWS S3
 # with AWS Transcribe
 #transcribe_dir('https://s3-eu-west-1.amazonaws.com/examplebucket/examples/',
-#               'odigo-auditor')
+#               'examplebucket')
 # or
-#transcribe_dir('examplebucket/examples/', 'odigo-auditor')
+#transcribe_dir('examplebucket/examples/', 'examplebucket')
