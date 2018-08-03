@@ -15,6 +15,7 @@ import boto3
 
 from comprehend import get_sentiment
 from sheets import append_row
+from text import check_promo
 
 transcribe_bucket_name = 'transcribe.odigo-auditor'
 mp3_bucket_name = 'mp3.odigo-auditor'
@@ -53,8 +54,12 @@ def main(transcribe_bucket_name, mp3_bucket_name):
                     # Get sentiment
                     sentiment = get_sentiment(text)
                     r['sentiment'] = sentiment
+                    # Check promotion
+                    promo = check_promo(text)
+                    r['promo'] = promo
                     # Save to Gooogle Sheets
-                    values = [r['ref'], r['text'], r['sentiment'], r['url']]
+                    values = [r['ref'], r['text'], r['promo'], r['sentiment'],
+                              r['url']]
                     append_row(values)
                     # Remove tmp json file from local machine
                     remove(key.key)
