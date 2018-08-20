@@ -1,7 +1,7 @@
-# Odigo Auditor
-**Name:** odigo-auditor<br>
-**Short Description:** Virtual auditor for [Odigo tool](https://www.prosodie.com/)<br>
-**GitHub:** https://github.com/korniichuk/odigo-auditor
+# Rightcall
+**Name:** rightcall<br>
+**Description:** Right Call/Contact Center Monitoring written in Python<br>
+**GitHub:** https://github.com/korniichuk/rightcall
 
 ## Requirements
 Please, install `chromium-chromedriver` package:

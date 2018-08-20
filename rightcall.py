@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 # 1. Download mp3 files from www.prosodie.com to local machine.
-# 2. Upload mp3 files from local machine to 'mp3.odigo-auditor' AWS S3 bucket.
-# 3. Trinscribe mp3 files from 'mp3.odigo-auditor' AWS S3 bucket to
-# 'transcribe.odigo-auditor' AWS S3 bucket.
+# 2. Upload mp3 files from local machine to 'mp3.rightcall' AWS S3 bucket.
+# 3. Trinscribe mp3 files from 'mp3.rightcall' AWS S3 bucket to
+# 'transcribe.rightcall' AWS S3 bucket.
 # 4. Save data to Google Sheets.
 
 import json
@@ -17,11 +17,11 @@ from comprehend import get_sentiment
 from sheets import append_row
 from text import check_promo
 
-transcribe_bucket_name = 'transcribe.odigo-auditor'
-mp3_bucket_name = 'mp3.odigo-auditor'
+transcribe_bucket_name = 'transcribe.rightcall'
+mp3_bucket_name = 'mp3.rightcall'
 
 def main(transcribe_bucket_name, mp3_bucket_name):
-    """Auditor for Odigo tool"""
+    """Right Call/Contact Center Monitoring written in Python"""
 
     s3 = boto3.resource('s3')
     for bucket in s3.buckets.all():

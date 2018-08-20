@@ -188,8 +188,8 @@ def search_by_ref(s, ref):
 #download_mp3_by_ref(s, username, passwd, '3905beTOd10339')
 
 # Example. Download mp3 file from www.prosodie.com by '3905beTOd10339'
-# ref number as /tmp/odigo.mp3
-#download_mp3_by_ref(s, username, passwd, '3905beTOd10339', '/tmp/odigo.mp3')
+# ref number as /tmp/example.mp3
+#download_mp3_by_ref(s, username, passwd, '3905beTOd10339', '/tmp/example.mp3')
 
 # Example. Download mp3 file/files from www.prosodie.com page by input csv file
 #download_mp3_by_csv(s, username, passwd, 'input.csv')

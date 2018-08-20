@@ -7,7 +7,7 @@ import sys
 
 import boto3
 
-bucket_name = 'mp3.odigo-auditor'
+bucket_name = 'mp3.rightcall'
 
 def upload_dir(dir_abs_path, bucket_name):
     """Upload all files from directory (recursively) to Amazon S3 bucket.
@@ -38,8 +38,8 @@ def upload_dir(dir_abs_path, bucket_name):
 
 def upload_file(file_abs_path, bucket_name, key_name=None):
     """Upload file to Amazon S3 bucket. If no `key_name`, file name used as
-       `key_name` (example: `file_abs_path` is '/tmp/odigo.mp3' and `key_name`
-       is None, that `key_name` is 'odigo.mp3').
+       `key_name` (example: `file_abs_path` is '/tmp/example.mp3' and `key_name`
+       is None, that `key_name` is 'example.mp3').
     Input:
         file_abs_path -- file abs path (required | type: str);
         bucket_name -- Amazon S3 bucket name (required | type: str);

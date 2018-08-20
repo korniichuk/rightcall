@@ -6,7 +6,7 @@ from os.path import basename, join
 
 import boto3
 
-bucket_name = 'transcribe.odigo-auditor'
+bucket_name = 'transcribe.rightcall'
 
 def transcribe_dir(src, dst=None, language_code='en-US'):
     """Transcribe all mp3 file/files from directory (recursively) on AWS S3 with
