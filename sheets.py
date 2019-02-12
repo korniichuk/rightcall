@@ -29,7 +29,7 @@ def append_row(values=[], spreadsheet_id=spreadsheet_id, range_=range_):
     service = setup_api()
     # How the input data should be interpreted
     value_input_option = 'RAW' # 'RAW' | 'USER_ENTERED'
-    # How the input data should be inserted.
+    # How the input data should be inserted
     insert_data_option = 'INSERT_ROWS' # 'OVERWRITE' | 'INSERT_ROWS'
     body = {'values': [values], 'majorDimension': 'ROWS'}
     try:
